@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f5f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 120px);
+            grid-template-rows: repeat(3, 120px);
+            gap: 15px;
+        }
+        .cell {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: white;
+            border: none;
+            transition: transform 0.15s ease-in-out; /* Smooth transition */
+        }
+        .cell:hover {
+            background-color: #e5e5e5;
+            transform: scale(1.05); /* Smaller hover effect */
+        }
+        .hidden {
+            display: none;
+        }
+        #winner-message {
+            font-size: 2em;
+            margin: 20px;
+            font-weight: bold;
+        }
+        .restart-btn {
+            padding: 12px 24px;
+            font-size: 1.2em;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .restart-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="winner-message" class="hidden"></div>
+        <div id="board" class="board"></div>
+        <button id="restart-btn" class="restart-btn hidden" onclick="restartGame()">Restart</button>
+    </div>
+
+    <script>
+        const board = document.getElementById("board");
+        const winnerMessage = document.getElementById("winner-message");
+        const restartButton = document.getElementById("restart-btn");
+        let currentPlayer = "X";
+        let gameBoard = ["", "", "", "", "", "", "", "", ""];
+        let gameActive = true;
+
+        // Create the Tic Tac Toe board dynamically
+        function createBoard() {
+            board.innerHTML = "";
+            gameBoard.forEach((cell, index) => {
+                const cellElement = document.createElement("div");
+                cellElement.classList.add("cell");
+                cellElement.setAttribute("data-index", index);
+                cellElement.innerText = cell;
+                cellElement.addEventListener("click", handleCellClick);
+                board.appendChild(cellElement);
+            });
+        }
+
+        // Handle a player clicking on a cell
+        function handleCellClick(event) {
+            const index = event.target.getAttribute("data-index");
+            
+            if (!gameBoard[index] && gameActive) {
+                gameBoard[index] = currentPlayer;
+                event.target.innerText = currentPlayer;
+                checkWinner();
+                currentPlayer = currentPlayer === "X" ? "O" : "X";
+            }
+        }
+
+        // Check for a winner or a tie
+        function checkWinner() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                [0, 4, 8], [2, 4, 6]  // Diagonals
+            ];
+
+            for (let combo of winningCombinations) {
+                let [a, b, c] = combo;
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                    displayWinner(gameBoard[a]);
+                    return;
+                }
+            }
+
+            // Check for tie
+            if (!gameBoard.includes("")) {
+                displayWinner("Nobody! It's a tie");
+            }
+        }
+
+        // Display the winner and reset the board
+        function displayWinner(winner) {
+            gameActive = false;
+            board.classList.add("hidden");
+            winnerMessage.classList.remove("hidden");
+            restartButton.classList.remove("hidden");
+            winnerMessage.innerText = `${winner} Wins!`;
+        }
+
+        // Restart the game
+        function restartGame() {
+            gameBoard = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = "X";
+            gameActive = true;
+            winnerMessage.classList.add("hidden");
+            restartButton.classList.add("hidden");
+            board.classList.remove("hidden");
+            createBoard();
+        }
+
+        createBoard();
+    </script>
+
+</body>
+</html>
